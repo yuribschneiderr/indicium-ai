@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  etl:
+    build: .
+    container_name: northwind-etl
+    command: python runEtl.py
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./docs:/app/docs
+    # Aguarda o ETL rodar antes de subir o app. O container vai sair (exit 0) aps concluir.
+
+  app:
+    build: .
+    container_name: northwind-app
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    depends_on:
+      - etl
+    restart: always
