@@ -38,6 +38,108 @@ st.markdown("""
     .insight-box { background: #F7FAFD; border: 1px solid #D4E8F7; border-radius: 8px; padding: 1.2rem 1.5rem; margin: 0.8rem 0; }
     .insight-box h4 { color: #2C5F8A; font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; }
     .insight-box p { color: #4A5A6A; font-size: 0.85rem; line-height: 1.6; margin: 0; }
+
+    /* ====== REGRAS DE IMPRESSÃO (Ctrl+P / Exportar PDF) ====== */
+    @media print {
+        /* Remove a sidebar, toolbar e header do Streamlit */
+        [data-testid="stSidebar"],
+        [data-testid="stToolbar"],
+        [data-testid="stHeader"],
+        [data-testid="stDecoration"],
+        .stDeployButton,
+        #MainMenu,
+        header,
+        footer { display: none !important; }
+
+        /* Força o container principal a ocupar 100% sem overflow */
+        .main .block-container {
+            max-width: 100% !important;
+            padding: 0.5rem 1rem !important;
+            margin: 0 !important;
+        }
+        .main, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow: visible !important;
+        }
+
+        /* Remove o scroll e garante que todo o conteúdo é visível */
+        html, body {
+            width: 100% !important;
+            overflow: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Força colunas do Streamlit a empilharem verticalmente */
+        [data-testid="stHorizontalBlock"],
+        [data-testid="column"] {
+            flex-direction: column !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            flex: 1 1 100% !important;
+        }
+        [data-testid="stHorizontalBlock"] > div {
+            width: 100% !important;
+            max-width: 100% !important;
+            flex: 1 1 100% !important;
+        }
+
+        /* Gráficos Altair: força largura fixa para caber no papel */
+        .vega-embed, .vega-embed svg,
+        [data-testid="stVegaLiteChart"],
+        [data-testid="stVegaLiteChart"] > div {
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow: visible !important;
+        }
+
+        /* Tabelas: impede overflow horizontal */
+        table, [data-testid="stTable"] {
+            width: 100% !important;
+            max-width: 100% !important;
+            font-size: 0.7rem !important;
+            overflow: visible !important;
+        }
+        table td, table th {
+            word-break: break-word !important;
+            max-width: 120px !important;
+            padding: 4px 6px !important;
+        }
+
+        /* Evita quebras de página dentro de elementos importantes */
+        .kpi-card, .insight-box,
+        .vega-embed, [data-testid="stVegaLiteChart"],
+        [data-testid="stTable"],
+        h1, h2, h3, h5 {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+        }
+
+        /* Força quebra de página antes de cada seção (h2) */
+        h2 { page-break-before: always !important; }
+        h2:first-of-type { page-break-before: avoid !important; }
+
+        /* KPI cards: layout compacto lado a lado na impressão */
+        .kpi-card {
+            padding: 0.6rem 0.8rem !important;
+            margin-bottom: 0.4rem !important;
+        }
+        .kpi-card .kpi-value { font-size: 1.2rem !important; }
+        .kpi-card .kpi-label { font-size: 0.7rem !important; }
+
+        /* Garante que as cores dos backgrounds são preservadas */
+        .kpi-card, .insight-box {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Reduz margens da página */
+        @page {
+            margin: 1cm;
+            size: A4 landscape;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
