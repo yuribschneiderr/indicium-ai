@@ -5,26 +5,23 @@ services:
     build: .
     container_name: northwind-etl
     command: python runEtl.py
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
     env_file:
       - .env
     volumes:
       - ./data:/app/data
       - ./docs:/app/docs
-    # Aguarda o ETL rodar antes de subir o app. O container vai sair (exit 0) aps concluir.
 
   app:
     build: .
     container_name: northwind-app
     ports:
       - "8501:8501"
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
     env_file:
       - .env
     depends_on:
       - etl
     restart: always
+
+
+
+
