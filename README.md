@@ -1,71 +1,62 @@
-# 📊 Relatório Executivo e Documentação: Northwind Analytics
+# 📊 Northwind Traders Analytics — Relatório Executivo
 
-> [!NOTE]
-> **Data:** Abril de 2026
-> **Para:** Tony Stark, CEO da Northwind Traders
-> **Assunto:** Análise de Faturamento, Ticket Médio e Churn (Janela de 2 Meses)
-
-## 📌 Contexto Estratégico
-
-Este projeto foi construído para fornecer uma visão integrada e ágil dos dados fragmentados da Northwind Traders. Através de um pipeline **ETL** (Extract, Transform, Load) construído em **Python**, os dados de planilhas locais foram processados e transformados em um **Star Schema**, centralizando-os em um banco de dados relacional (Supabase/PostgreSQL).
-
-A partir deste repositório centralizado, construímos um painel interativo (App Streamlit) para monitorar nossos principais indicadores de performance (KPIs).
-
-## 🚀 Arquitetura Implementada
-
-- **Pipeline (ETL):** Módulos Python em `pipeline/dimensao/` e `pipeline/fato/` extraem, limpam e relacionam dados de 14 planilhas.
-- **Banco de Dados:** Utilização do PostgreSQL via **Supabase** para uma camada de armazenamento robusta e acessível.
-- **Visualização (BI):** Dashboard interativo em **Streamlit**, projetado para permitir análises aprofundadas.
-- **Ambiente Isolado:** Configuração completa com **Docker** (`docker-compose`), garantindo que qualquer analista da Northwind possa rodar a aplicação em segundos com o comando `docker-compose up`.
+Este repositório contém uma solução completa de **Engenharia de Dados e Business Intelligence** projetada para transformar dados operacionais da Northwind Traders em insights estratégicos.
 
 ---
 
-## 📈 Principais Indicadores Analisados (KPIs)
+## 📌 Visão Geral do Projeto
 
-O Dashboard apresenta os seguintes indicadores-chave (com dados projetados até o último ano registrado, 1998):
+O objetivo central é fornecer ao corpo executivo uma visão unificada sobre **Faturamento, Comportamento de Compra (Cross-Sell) e Fidelidade de Clientes (Churn)**. A solução abrange desde a extração de dados brutos até a visualização em um dashboard interativo projetado para suporte à decisão.
 
-### 1. Faturamento e Pedidos
-- **Faturamento Total:** Calculado pelo preço dos itens, quantidade e descontos aplicados.
-- **Total de Pedidos Realizados.**
-- **Ticket Médio:** Permite identificar sazonalidades. Recomenda-se realizar campanhas de *cross-sell* oferecendo produtos correlatos (ex: oferecer queijos e cervejas na compra de vinhos) para elevar este número.
-
-### 2. Taxa de Churn (Inatividade)
-- **Definição de Churn (2 meses):** Clientes que não realizaram pedidos nos últimos 60 dias (em relação à data máxima do banco de dados).
-- Como somos uma empresa focada no ramo de alimentos e bebidas, **um cliente que não compra há mais de 2 meses é considerado um cliente em risco (churn).**
-- O painel exibe um gráfico de proporção dos clientes ativos vs. clientes perdidos na janela estipulada.
-
-### 3. Top 10 Produtos por Receita
-- A visualização identifica exatamente onde se encontra o nosso maior *Market Share*. O foco promocional (Upselling) deve ser mantido nestes "Carros-Chefe".
+### 🚀 Diferenciais Técnicos
+- **Pipeline ETL Escalável**: Processamento de dados transacionais com tratamento de lógica de negócios (descontos, datas de entrega e regionalização).
+- **Banco de Dados Cloud**: Integração nativa com **Supabase (PostgreSQL)** via camada transacional e analítica.
+- **Visualização Executiva**: Dashboard construído em **Streamlit** com design limpo (pastel azul), rótulos de dados nativos e layout otimizado para **exportação em PDF**.
+- **Infraestrutura como Código**: Ambiente totalmente isolado e reprodutível via **Docker & Docker Compose**.
 
 ---
 
-## 💡 Próximos Passos e Recomendações (Ações de Negócio)
+## 📈 Inteligência de Negócio Implementada
 
-> [!TIP]
-> **Ações sugeridas baseadas na análise de dados:**
+### 1. Monitoramento Granular de Churn
+Diferente de modelos binários, implemento uma régua de fidelidade em 3 níveis:
+- **Ativo**: < 45 dias de inatividade.
+- **Em Risco**: 45–60 dias (Janela crítica para intervenção).
+- **Churn**: > 60 dias (Inatividade confirmada).
 
-1. **Aumentar o Ticket Médio:**
-   - Criar pacotes (Combos) com base nos Top 10 produtos de maior faturamento.
-   - Implementar estratégias de desconto por volume ("Leve 3, Pague 2") em produtos de giro médio.
+### 2. Market Basket Analysis (Análise de Cesta)
+Algoritmo de associação que identifica quais produtos e categorias são comprados juntos com maior frequência. Esta análise é a base para o plano de ação de **Cross-Sell** e aumento do **Ticket Médio**.
 
-2. **Reduzir o Churn:**
-   - Como o ciclo de vida dos nossos produtos é curto (2 meses para Churn), devemos implementar um alerta automático para clientes que não compram há **45 dias**.
-   - Oferecer cupons exclusivos ou amostras de lançamentos (ex: Frete Grátis) para clientes que estão se aproximando dos 60 dias de inatividade.
+### 3. Expansão Regional
+Mapeamento geográfico de performance para identificar mercados com alta demanda, mas baixo ticket médio, orientando a expansão de centros de distribuição.
 
 ---
 
-## 🛠 Como Rodar este Projeto (Instruções Técnicas)
+## 🛠 Como Executar o Projeto
 
-Se desejar executar a aplicação na sua própria máquina, o repositório contém tudo pronto para uso.
+1.  **Clone o repositório** e garanta que possui o **Docker** instalado.
+2.  Configure suas credenciais do banco no arquivo `.env` (exemplo: `DATABASE_URL=postgresql://user:pass@host:port/db`).
+3.  Execute o comando:
+    ```bash
+    docker-compose up --build -d
+    ```
+4.  Acesse o dashboard em: `http://localhost:8501`.
 
-1. **Pré-requisito:** Instalar Docker e Docker Compose.
-2. **Execução:**
-   Abra o terminal na pasta do projeto e execute:
-   ```bash
-   docker-compose up --build
-   ```
-3. O pipeline de **ETL** (`northwind-etl`) irá rodar automaticamente e fazer o upload/atualização no Supabase.
-4. O painel do **Streamlit** (`northwind-app`) subirá e ficará acessível no navegador pelo endereço:
-   - `http://localhost:8501`
+---
 
-*(Para exportar este painel em PDF, basta abrir o Streamlit no Google Chrome, clicar em "Imprimir" (`Ctrl+P`) e selecionar "Salvar como PDF").*
+## 📂 Documentação Interna (Pasta `script/`)
+Para detalhes aprofundados, consulte os arquivos na pasta `script/` (não incluídos no versionamento para preservar segredos de negócio):
+- `regras_de_negocio.md`: Detalhamento dos cálculos e critérios técnicos.
+- `infra_e_setup.md`: Guia de manutenção e atualização da infraestrutura.
+- `modelo_email.md`: Modelo para comunicação de entrega do relatório aos stakeholders.
+
+---
+
+## 💡 Plano de Ação Estratégico
+O dashboard inclui um módulo fixo de recomendações que utiliza os dados processados para sugerir:
+- Criação de combos promocionais baseados em co-ocorrência.
+- Programas de reativação proativa para clientes na zona de risco (45-60 dias).
+- Estratégias preventivas de sazonalidade.
+
+---
+*Este projeto foi desenvolvido como um desafio técnico de Data Engineering & Analytics.*
