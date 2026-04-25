@@ -2,8 +2,8 @@ import os
 import pandas as pd
 
 def run_data_quality():
-    data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
-    docs_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'docs')
+    data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data')
+    docs_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'docs')
     os.makedirs(docs_dir, exist_ok=True)
     
     report_path = os.path.join(docs_dir, 'data_quality_report.md')

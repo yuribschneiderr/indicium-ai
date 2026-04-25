@@ -5,43 +5,50 @@ from pipeline.utils.db import loadToDb
 def processFVendas():
     """
     Função dedicada para criar e carregar a tabela fato 'fVendas'.
-    Aqui pegamos os detalhes dos pedidos, calculamos o valor líquido e padronizamos as colunas.
+    Aqui pegar os detalhes dos pedidos, calcular o valor líquido e padronizar as colunas.
     """
     dataDir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data')
     
-    # Carregando tabelas de pedidos e seus detalhes
+    # Carregar tabelas de pedidos e seus detalhes
     ordersData = pd.read_csv(os.path.join(dataDir, 'orders.csv'), sep=';', encoding='utf-8')
     orderDetailsData = pd.read_csv(os.path.join(dataDir, 'order_details.csv'), sep=';', encoding='utf-8')
     
-    # Fazendo o merge (Join) de detalhes do pedido com os pedidos
+    # Fazer o merge (Join) de detalhes do pedido com os pedidos
     fVendas = orderDetailsData.merge(ordersData, on='order_id', how='inner')
     
-    # Calculando o valor líquido: preço unitário * quantidade * (1 - desconto percentual)
+    # Calcular o valor líquido: preço unitário * quantidade * (1 - desconto percentual)
     fVendas['valor_liquido'] = fVendas['unit_price'] * fVendas['quantity'] * (1 - fVendas['discount'])
     
-    # Selecionando colunas relevantes
+    # Selecionar colunas relevantes (incluindo dados regionais e datas de entrega)
     relevantColumns = [
         'order_id', 'product_id', 'customer_id', 'employee_id', 
-        'order_date', 'unit_price', 'quantity', 'discount', 'valor_liquido',
-        'freight', 'ship_country'
+        'order_date', 'required_date', 'shipped_date',
+        'unit_price', 'quantity', 'discount', 'valor_liquido',
+        'freight', 'ship_city', 'ship_region', 'ship_country'
     ]
     fVendas = fVendas[relevantColumns].copy()
     
-    # Convertendo a data para um tipo de dado datetime do pandas
+    # Converter as datas para tipo datetime do pandas
     fVendas['order_date'] = pd.to_datetime(fVendas['order_date'])
+    fVendas['required_date'] = pd.to_datetime(fVendas['required_date'])
+    fVendas['shipped_date'] = pd.to_datetime(fVendas['shipped_date'])
     
-    # Padronizando o nome das colunas
+    # Padronizar o nome das colunas
     fVendas.rename(columns={
         'order_id': 'orderId',
         'product_id': 'productId',
         'customer_id': 'customerId',
         'employee_id': 'employeeId',
         'order_date': 'orderDate',
+        'required_date': 'requiredDate',
+        'shipped_date': 'shippedDate',
         'unit_price': 'unitPrice',
         'quantity': 'quantity',
         'discount': 'discount',
-        'valor_liquido': 'netValue',  # Renomeando de valor líquido para netValue, padronizando em inglês
+        'valor_liquido': 'netValue',  # Renomear de valor líquido para netValue, padronizar em inglês
         'freight': 'freight',
+        'ship_city': 'shipCity',
+        'ship_region': 'shipRegion',
         'ship_country': 'shipCountry'
     }, inplace=True)
     
