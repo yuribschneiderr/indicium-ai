@@ -10,6 +10,7 @@ from pipeline.dimensao.dFuncionarios import processDFuncionarios
 
 from pipeline.fato.fVendas import processFVendas
 from pipeline.fato.fChurnClientes import processFChurnClientes
+from pipeline.fato.fCesta import processFCesta
 
 def runEtl():
     """
@@ -28,6 +29,7 @@ def runEtl():
     print("\n--- Processando Fatos ---")
     processFVendas()
     processFChurnClientes()
+    processFCesta()
     
     print("\nETL concluído com sucesso! Os dados foram enviados para o Supabase.")
 
