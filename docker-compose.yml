@@ -1,10 +1,13 @@
-version: '3.8'
+
 
 services:
   etl:
     build: .
     container_name: northwind-etl
     command: python runEtl.py
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     env_file:
       - .env
     volumes:
@@ -17,6 +20,9 @@ services:
     container_name: northwind-app
     ports:
       - "8501:8501"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     env_file:
       - .env
     depends_on:

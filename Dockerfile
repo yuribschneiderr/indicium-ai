@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar os arquivos da aplicação
 COPY ./app ./app
 COPY ./pipeline ./pipeline
+COPY ./data ./data
 COPY runEtl.py .
 
 # Porta do Streamlit
