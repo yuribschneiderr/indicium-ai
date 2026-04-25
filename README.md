@@ -44,6 +44,14 @@ Mapeamento geográfico de performance para identificar mercados com alta demanda
 
 ---
 
+## 🌐 Dashboard Publicado
+
+O relatório executivo está disponível online via Streamlit Cloud:
+
+👉 **[Acessar Dashboard ao Vivo](https://indicium-ai-49xwsufu8fexdnfxzczuyh.streamlit.app/)**
+
+---
+
 ## 💡 Plano de Ação Estratégico
 O dashboard inclui um módulo fixo de recomendações que utiliza os dados processados para sugerir:
 - Criação de combos promocionais baseados em co-ocorrência.
