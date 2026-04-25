@@ -44,14 +44,6 @@ Mapeamento geográfico de performance para identificar mercados com alta demanda
 
 ---
 
-## 📂 Documentação Interna (Pasta `script/`)
-Para detalhes aprofundados, consulte os arquivos na pasta `script/` (não incluídos no versionamento para preservar segredos de negócio):
-- `regras_de_negocio.md`: Detalhamento dos cálculos e critérios técnicos.
-- `infra_e_setup.md`: Guia de manutenção e atualização da infraestrutura.
-- `modelo_email.md`: Modelo para comunicação de entrega do relatório aos stakeholders.
-
----
-
 ## 💡 Plano de Ação Estratégico
 O dashboard inclui um módulo fixo de recomendações que utiliza os dados processados para sugerir:
 - Criação de combos promocionais baseados em co-ocorrência.
