@@ -1,14 +1,14 @@
-# 📊 Northwind Traders Analytics — Relatório Executivo
+# Northwind Traders Analytics — Relatório Executivo
 
 Este repositório contém uma solução completa de **Engenharia de Dados e Business Intelligence** projetada para transformar dados operacionais da Northwind Traders em insights estratégicos.
 
 ---
 
-## 📌 Visão Geral do Projeto
+## Visão Geral do Projeto
 
 O objetivo central é fornecer ao corpo executivo uma visão unificada sobre **Faturamento, Comportamento de Compra (Cross-Sell) e Fidelidade de Clientes (Churn)**. A solução abrange desde a extração de dados brutos até a visualização em um dashboard interativo projetado para suporte à decisão.
 
-### 🚀 Diferenciais Técnicos
+### Diferenciais Técnicos
 - **Pipeline ETL Escalável**: Processamento de dados transacionais com tratamento de lógica de negócios (descontos, datas de entrega e regionalização).
 - **Banco de Dados Cloud**: Integração nativa com **Supabase (PostgreSQL)** via camada transacional e analítica.
 - **Visualização Executiva**: Dashboard construído em **Streamlit** com design limpo (pastel azul), rótulos de dados nativos e layout otimizado para **exportação em PDF**.
@@ -16,7 +16,7 @@ O objetivo central é fornecer ao corpo executivo uma visão unificada sobre **F
 
 ---
 
-## 📈 Inteligência de Negócio Implementada
+## Inteligência de Negócio Implementada
 
 ### 1. Monitoramento Granular de Churn
 Diferente de modelos binários, implemento uma régua de fidelidade em 3 níveis:
@@ -32,7 +32,7 @@ Mapeamento geográfico de performance para identificar mercados com alta demanda
 
 ---
 
-## 🛠 Como Executar o Projeto
+## Como Executar o Projeto
 
 1.  **Clone o repositório** e garanta que possui o **Docker** instalado.
 2.  Configure suas credenciais do banco no arquivo `.env` (exemplo: `DATABASE_URL=postgresql://user:pass@host:port/db`).
@@ -44,15 +44,15 @@ Mapeamento geográfico de performance para identificar mercados com alta demanda
 
 ---
 
-## 🌐 Dashboard Publicado
+## Dashboard Publicado
 
 O relatório executivo está disponível online via Streamlit Cloud:
 
-👉 **[Acessar Dashboard ao Vivo](https://indicium-ai-49xwsufu8fexdnfxzczuyh.streamlit.app/)**
+**[Acessar Dashboard via Streamlit Cloud](https://indicium-ai-49xwsufu8fexdnfxzczuyh.streamlit.app/)**
 
 ---
 
-## 💡 Plano de Ação Estratégico
+## Plano de Ação Estratégico
 O dashboard inclui um módulo fixo de recomendações que utiliza os dados processados para sugerir:
 - Criação de combos promocionais baseados em co-ocorrência.
 - Programas de reativação proativa para clientes na zona de risco (45-60 dias).
