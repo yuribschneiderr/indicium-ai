@@ -162,7 +162,8 @@ def loadData():
         fChurnClientes = pd.read_sql_table('fChurnClientes', conn)
         dProdutos = pd.read_sql_table('dProdutos', conn)
         fCesta = pd.read_sql_table('fCesta', conn)
-    return fVendas, dClientes, fChurnClientes, dProdutos, fCesta
+        dFuncionarios = pd.read_sql_table('dFuncionarios', conn)
+    return fVendas, dClientes, fChurnClientes, dProdutos, fCesta, dFuncionarios
 
 def renderKpi(label, value, detail=""):
     detail_html = f'<div class="kpi-detail">{detail}</div>' if detail else ""
@@ -172,7 +173,7 @@ def renderKpi(label, value, detail=""):
 st.title("Northwind Traders — Relatório Executivo")
 
 try:
-    fVendas, dClientes, fChurnClientes, dProdutos, fCesta = loadData()
+    fVendas, dClientes, fChurnClientes, dProdutos, fCesta, dFuncionarios = loadData()
 except Exception as e:
     st.error(f"Erro ao carregar dados do banco: {e}")
     st.stop()
@@ -459,7 +460,104 @@ lblTicket = alt.Chart(catTicketAgg).mark_text(dx=5, align='left', fontSize=11, c
 st.altair_chart((barTicket + lblTicket).properties(height=280), use_container_width=True)
 
 # ==========================================================================
-# SEÇÃO 5: PLANO DE AÇÃO
+# SEÇÃO 5: ANÁLISE POR VENDEDOR
+# ==========================================================================
+st.header("Análise por Vendedor")
+
+# Merge de vendas com funcionários para obter o nome do vendedor
+vendasVendedor = fVendas.merge(dFuncionarios, on='employeeId', how='left')
+
+# --- KPIs por vendedor ---
+revByVendedor = vendasVendedor.groupby('fullName').agg(
+    totalRevenue=('netValue', 'sum'),
+    totalOrders=('orderId', 'nunique')
+).reset_index()
+revByVendedor['ticketMedio'] = revByVendedor['totalRevenue'] / revByVendedor['totalOrders']
+
+# Cross-sell por vendedor: contar quantos pares de produtos distintos cada vendedor vende no mesmo pedido
+from itertools import combinations
+produtosPorPedido = vendasVendedor.groupby(['orderId', 'fullName'])['productId'].apply(list).reset_index()
+combosList = []
+for _, row in produtosPorPedido.iterrows():
+    prods = sorted(set(row['productId']))
+    if len(prods) >= 2:
+        combosList.append({'fullName': row['fullName'], 'combos': len(list(combinations(prods, 2)))})
+    else:
+        combosList.append({'fullName': row['fullName'], 'combos': 0})
+crossVendedor = pd.DataFrame(combosList).groupby('fullName')['combos'].sum().reset_index()
+crossVendedor.columns = ['fullName', 'totalCombos']
+
+topSeller = revByVendedor.sort_values('totalRevenue', ascending=False).iloc[0]
+topTicket = revByVendedor.sort_values('ticketMedio', ascending=False).iloc[0]
+topCross = crossVendedor.sort_values('totalCombos', ascending=False).iloc[0]
+
+kv1, kv2, kv3 = st.columns(3)
+with kv1:
+    renderKpi("Maior Faturamento", f"US$ {topSeller['totalRevenue']:,.2f}", f"{topSeller['fullName']} — {int(topSeller['totalOrders'])} pedidos")
+with kv2:
+    renderKpi("Maior Ticket Médio", f"US$ {topTicket['ticketMedio']:,.2f}", f"{topTicket['fullName']}")
+with kv3:
+    renderKpi("Melhor Cross-Seller", f"{int(topCross['totalCombos'])} combos", f"{topCross['fullName']} — mais produtos vendidos juntos")
+
+st.markdown("---")
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("##### Faturamento por Vendedor")
+    revByVendedor = revByVendedor.sort_values('totalRevenue', ascending=False)
+    revByVendedor['label'] = (revByVendedor['totalRevenue'] / 1000).round(1).astype(str) + 'k'
+    barRevVend = alt.Chart(revByVendedor).mark_bar(cornerRadiusEnd=4).encode(
+        x=alt.X('totalRevenue:Q', title='Faturamento (US$)'),
+        y=alt.Y('fullName:N', sort='-x', title='', axis=alt.Axis(labelLimit=200)),
+        color=alt.Color('totalRevenue:Q', scale=alt.Scale(scheme='blues'), legend=None),
+        tooltip=[alt.Tooltip('fullName:N', title='Vendedor'), alt.Tooltip('totalRevenue:Q', title='Faturamento', format=',.2f'), alt.Tooltip('totalOrders:Q', title='Pedidos')]
+    )
+    lblRevVend = alt.Chart(revByVendedor).mark_text(dx=5, align='left', fontSize=11, color='#2C5F8A').encode(
+        x='totalRevenue:Q', y=alt.Y('fullName:N', sort='-x'), text='label:N'
+    )
+    st.altair_chart((barRevVend + lblRevVend).properties(height=350), use_container_width=True)
+
+with col2:
+    st.markdown("##### Ticket Médio por Vendedor")
+    revByVendedor = revByVendedor.sort_values('ticketMedio', ascending=False)
+    revByVendedor['labelTicket'] = 'US$ ' + revByVendedor['ticketMedio'].round(0).astype(int).astype(str)
+    barTicketVend = alt.Chart(revByVendedor).mark_bar(cornerRadiusEnd=4).encode(
+        x=alt.X('ticketMedio:Q', title='Ticket Médio (US$)'),
+        y=alt.Y('fullName:N', sort='-x', title='', axis=alt.Axis(labelLimit=200)),
+        color=alt.Color('ticketMedio:Q', scale=alt.Scale(scheme='teals'), legend=None),
+        tooltip=[alt.Tooltip('fullName:N', title='Vendedor'), alt.Tooltip('ticketMedio:Q', title='Ticket Médio', format=',.2f'), alt.Tooltip('totalOrders:Q', title='Pedidos')]
+    )
+    lblTicketVend = alt.Chart(revByVendedor).mark_text(dx=5, align='left', fontSize=11, color='#2C5F8A').encode(
+        x='ticketMedio:Q', y=alt.Y('fullName:N', sort='-x'), text='labelTicket:N'
+    )
+    st.altair_chart((barTicketVend + lblTicketVend).properties(height=350), use_container_width=True)
+
+st.markdown("##### Cross-Sell por Vendedor — Combos de Produtos Vendidos Juntos")
+st.markdown("""
+<div class="insight-box">
+    <h4>Como interpretar esta análise?</h4>
+    <p>O total de <strong>combos</strong> representa a soma de todos os pares de produtos distintos vendidos no mesmo pedido
+    por cada vendedor. Quanto mais combos, maior a capacidade do vendedor de realizar vendas cruzadas (cross-sell),
+    o que indica habilidade de sugerir produtos complementares e elevar o ticket médio.</p>
+</div>
+""", unsafe_allow_html=True)
+
+crossVendedor = crossVendedor.sort_values('totalCombos', ascending=False)
+crossVendedor['label'] = crossVendedor['totalCombos'].astype(str)
+barCrossVend = alt.Chart(crossVendedor).mark_bar(cornerRadiusEnd=4).encode(
+    x=alt.X('totalCombos:Q', title='Total de Combos de Produtos'),
+    y=alt.Y('fullName:N', sort='-x', title='', axis=alt.Axis(labelLimit=200)),
+    color=alt.Color('totalCombos:Q', scale=alt.Scale(scheme='purples'), legend=None),
+    tooltip=[alt.Tooltip('fullName:N', title='Vendedor'), alt.Tooltip('totalCombos:Q', title='Total de Combos')]
+)
+lblCrossVend = alt.Chart(crossVendedor).mark_text(dx=5, align='left', fontSize=11, color='#2C5F8A').encode(
+    x='totalCombos:Q', y=alt.Y('fullName:N', sort='-x'), text='label:N'
+)
+st.altair_chart((barCrossVend + lblCrossVend).properties(height=350), use_container_width=True)
+
+
+# ==========================================================================
+# SEÇÃO 6: PLANO DE AÇÃO
 # ==========================================================================
 st.header("Plano de Ação e Recomendações Estratégicas")
 
